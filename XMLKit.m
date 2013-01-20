@@ -8,6 +8,7 @@
 
 #import "XMLKit.h"
 #import <libxml2/libxml/xmlreader.h>
+#import "GTMNSString+HTML.h"
 
 //////////////////////////////////////////////////////////////////////////////////////
 @implementation XMLElement
@@ -217,7 +218,7 @@ void error( void * ctx, const char * msg, ... )
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 -(void)documentDidEnd
 {
-    if([currentElement.name isEqualToString:rootElement.name] || !currentElement)
+    if([currentElement.name isEqualToString:rootElement.name] || !currentElement || [currentElement.parent.name isEqualToString:rootElement.name])
         isValid = YES;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -250,6 +251,11 @@ void error( void * ctx, const char * msg, ... )
     while ((r = [s rangeOfString:@"<[^>]+>" options:NSRegularExpressionSearch]).location != NSNotFound)
         s = [s stringByReplacingCharactersInRange:r withString:@""];
     return s;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+-(NSString*)xmlSafe
+{
+    return [self gtm_stringByEscapingForAsciiHTML];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
