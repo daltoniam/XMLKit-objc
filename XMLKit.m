@@ -47,7 +47,7 @@
     if([root.name isEqualToString:[tag lowercaseString]])
     {
         if(!array)
-            array = [[NSMutableArray alloc] init];
+            array = [NSMutableArray array];
         if(![array containsObject:root])
             [array addObject:root];
     }
