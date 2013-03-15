@@ -15,6 +15,7 @@
 @property(nonatomic, copy)NSString* name;
 @property(nonatomic, copy)NSString* text;
 @property(nonatomic, retain)XMLElement* parent;
+@property(nonatomic, assign)int end;
 //@property(nonatomic, assign)BOOL isValid;
 
 -(NSString*)convertToString;
@@ -34,7 +35,7 @@
 
 +(XMLElement*)ParseXMLString:(NSString*)string;
 
--(XMLElement*)parse:(NSString*)xmlString;
+//-(XMLElement*)parse:(NSString*)xmlString;
 
 @end
 //////////////////////////////////////////////////////////////////////////////////////
