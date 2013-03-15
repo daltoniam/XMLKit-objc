@@ -7,7 +7,6 @@
 //
 
 #import "XMLKit.h"
-#import <libxml2/libxml/xmlreader.h>
 #import "GTMNSString+HTML.h"
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -84,21 +83,10 @@
 //////////////////////////////////////////////////////////////////////////////////////
 @interface XMLKit()
 
--(void)didStartElement:(NSString*)tag attributes:(NSDictionary*)attributeDict;
--(void)foundCharacters:(NSString*)string;
--(void)didEndElement:(NSString*)tag;
--(void)documentDidEnd;
-
 @end
 
 //////////////////////////////////////////////////////////////////////////////////////
 @implementation XMLKit
-
-static void elementDidStart(void *ctx,const xmlChar *name,const xmlChar **atts);
-static void foundChars(void *ctx,const xmlChar *ch,int len);
-static void elementDidEnd(void *ctx,const xmlChar *name);
-static void documentDidEnd(void *ctx);
-static void error( void * ctx, const char * msg, ... );
 
 //////////////////////////////////////////////////////////////////////////////////////
 +(XMLElement*)ParseXMLString:(NSString*)string
@@ -145,7 +133,7 @@ static void error( void * ctx, const char * msg, ... );
             {
                 NSString* tag = [string substringWithRange:NSMakeRange(start, end-start)]; 
                 XMLElement* element = [XMLKit parseElement:tag];
-                //NSLog(@"start tag: %@",element.name);
+                //NSLog(@"start tag: %@ attributes: %@",element.name,element.attributes);
                 element.end = end;
                 if(!rootElement)
                     rootElement = element;
@@ -157,9 +145,9 @@ static void error( void * ctx, const char * msg, ... );
                 }
                 if([string characterAtIndex:end-2] == '/') //this must be a self closing element
                 {
-                    //NSLog(@"end tag: %@",element.name);
-                    if(currentElement)
-                        currentElement = currentElement.parent;
+                    //NSLog(@"self close end tag: %@",element.name);
+                    //if(currentElement)
+                    //    currentElement = currentElement.parent;
                 }
                 else
                     currentElement = element;
@@ -171,7 +159,7 @@ static void error( void * ctx, const char * msg, ... );
 //////////////////////////////////////////////////////////////////////////////////////
 +(XMLElement*)parseElement:(NSString*)text
 {
-    NSLog(@"text: %@",text);
+    //NSLog(@"text: %@",text);
     int offset = 1;
     if([text characterAtIndex:text.length-2] == '/')
         offset = 2;
@@ -184,7 +172,6 @@ static void error( void * ctx, const char * msg, ... );
     {
         NSString* attrString = [text substringWithRange:NSMakeRange(fname+1, (text.length-1)-(fname+offset))];
         NSArray* attrArray = [attrString componentsSeparatedByString:@" "];
-        NSLog(@"attrArray: %@",attrArray);
         NSMutableArray* collect = [NSMutableArray arrayWithCapacity:attrArray.count];
         for(int i = 0; i < attrArray.count; i++)
         {
@@ -196,8 +183,9 @@ static void error( void * ctx, const char * msg, ... );
                     [collect addObject:string];
                 else
                 {
-                    last = [last stringByAppendingString:string];
-                    [collect replaceObjectAtIndex:i withObject:last];
+                    last = [last stringByAppendingFormat:@" %@",string];
+                    [collect removeLastObject];
+                    [collect addObject:last];
                 }
             }
             else
@@ -233,148 +221,9 @@ static void error( void * ctx, const char * msg, ... );
     element.name = [text substringWithRange:NSMakeRange(1, fname-1)];
     element.name = [element.name stringByReplacingOccurrencesOfString:@"/" withString:@""];
     element.childern = [NSMutableArray array];
-    NSLog(@"element name: %@",element.name);
-    NSLog(@"attributes: %@",element.attributes);
+    //NSLog(@"element name: %@",element.name);
+    //NSLog(@"attributes: %@",element.attributes);
     return element;
-}
-//////////////////////////////////////////////////////////////////////////////////////
-//-(XMLElement*)parse:(NSString*)xmlString
-//{
-    /*NSLog(@"xmlString: %@",xmlString);
-    xmlSAXHandler saxHandler;
-    memset( &saxHandler, 0, sizeof(saxHandler) );
-    saxHandler.startElement = &elementDidStart;
-    saxHandler.endElement = &elementDidEnd;
-    saxHandler.characters = &foundChars;
-    saxHandler.endDocument = &documentDidEnd;
-    saxHandler.error = &error;
-    xmlSAXUserParseMemory(&saxHandler,self,[xmlString UTF8String], (int)[xmlString length]);
-    //rootElement.isValid = isValid;
-    if(isValid)
-        return rootElement;
-    return nil;*/
-    
-     //xmlParserCtxtPtr xmlctx = NULL;
-     //xmlctx = xmlCreatePushParserCtxt(&saxHandler,self, NULL, 0, NULL);
-     //if (!xmlctx)
-     //return nil;
-     //if(!xmlParseChunk(xmlctx, [xmlString UTF8String], (int)[xmlString length], 0))
-     //{
-     //xmlFreeParserCtxt(xmlctx);
-     //return nil;
-     //}
-     //xmlFreeParserCtxt(xmlctx);
-//}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//private
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//c functions that forward to objective c functions
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void elementDidStart(void *ctx,const xmlChar *name,const xmlChar **atts)
-{
-    NSString* elementName = [NSString stringWithCString:(const char*)name encoding:NSUTF8StringEncoding];
-    NSMutableDictionary* collect = nil;
-    
-    if(atts)
-    {
-        const xmlChar *attrib = NULL;
-        collect = [NSMutableDictionary dictionary];
-        int i = 0;
-        NSString* key = @"";
-        do
-        {
-            attrib = *atts;
-            if(!attrib)
-                break;
-            if(i % 2 != 0 && i != 0)
-            {
-                NSString* val = [NSString stringWithCString:(const char*)attrib encoding:NSUTF8StringEncoding];
-                [collect setObject:val forKey:key];
-            }
-            else
-                key = [NSString stringWithCString:(const char*)attrib encoding:NSUTF8StringEncoding];
-            atts++;
-            i++;
-        }while(attrib != NULL);
-    }
-    
-    NSString* tag = [elementName lowercaseString];
-    //NSLog(@"collect: %@",collect);
-    XMLKit* parser = (XMLKit*)ctx;
-    [parser didStartElement:tag attributes:collect];
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void foundChars(void *ctx,const xmlChar *ch,int len)
-{
-    NSString* string = [NSString stringWithCString:(const char*)ch encoding:NSUTF8StringEncoding];
-    XMLKit* parser = (XMLKit*)ctx;
-    [parser foundCharacters:string];
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void elementDidEnd(void *ctx,const xmlChar *name)
-{
-    NSString* elementName = [NSString stringWithCString:(const char*)name encoding:NSUTF8StringEncoding];
-    NSString* tag = [elementName lowercaseString];
-    XMLKit* parser = (XMLKit*)ctx;
-    [parser didEndElement:tag];
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void documentDidEnd(void *ctx)
-{
-    XMLKit* parser = (XMLKit*)ctx;
-    [parser documentDidEnd];
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void error( void * ctx, const char * msg, ... )
-{
-    //NSLog(@"got error parsing");
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//objective c function from c functions above
-///////////////////////////////////////////////////////////////////////////////////////////////////
--(void)didStartElement:(NSString*)tag attributes:(NSDictionary*)attributeDict
-{
-    NSString* name = [tag lowercaseString];
-    //NSLog(@"tag: %@ attrib: %@",tag,attributeDict);
-    XMLElement* element = [XMLElement elementWithName:name attributes:attributeDict];
-    if(!rootElement)
-        rootElement = [element retain];
-    else
-    {
-        element.parent = currentElement;
-        [currentElement.childern addObject:element];
-    }
-    currentElement = element;
-        
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
--(void)foundCharacters:(NSString*)string
-{
-    currentElement.text = string;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
--(void)didEndElement:(NSString*)tag
-{
-    currentElement = currentElement.parent;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
--(void)documentDidEnd
-{
-    if([currentElement.name isEqualToString:rootElement.name] || !currentElement || [currentElement.parent.name isEqualToString:rootElement.name])
-        isValid = YES;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////
--(void)printElement:(XMLElement*)element
-{
-    for(XMLElement* child in element.childern)
-    {
-        NSLog(@"<%@>%@</%@>",child.name,child.text,child.name);
-        [self printElement:child];
-    }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
