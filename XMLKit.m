@@ -219,7 +219,7 @@
         }
     }
     element.name = [text substringWithRange:NSMakeRange(1, fname-1)];
-    element.name = [element.name stringByReplacingOccurrencesOfString:@"/" withString:@""];
+    element.name = [[element.name stringByReplacingOccurrencesOfString:@"/" withString:@""] lowercaseString];
     element.childern = [NSMutableArray array];
     //NSLog(@"element name: %@",element.name);
     //NSLog(@"attributes: %@",element.attributes);
