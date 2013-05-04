@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////////
 +(XMLElement*)elementWithName:(NSString*)name attributes:(NSDictionary*)dict
 {
-    XMLElement* element = [[[XMLElement alloc] init] autorelease];
+    XMLElement* element = [[XMLElement alloc] init];
     element.name = name;
     element.attributes = [NSMutableDictionary dictionaryWithDictionary:dict];
     element.childern = [NSMutableArray array];
@@ -163,7 +163,7 @@
     int offset = 1;
     if([text characterAtIndex:text.length-2] == '/')
         offset = 2;
-    XMLElement* element = [[[XMLElement alloc] init] autorelease];
+    XMLElement* element = [[XMLElement alloc] init];
     NSRange range = [text rangeOfString:@" "];
     int fname = range.location;
     if(fname < 0 || range.location == NSNotFound)
