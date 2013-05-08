@@ -451,7 +451,13 @@ static int EscapeMapCompare(const void *ucharVoid, const void *mapVoid) {
 	return [self gtm_stringByEscapingHTMLUsingTable:gAsciiHTMLEscapeMap
 											 ofSize:sizeof(gAsciiHTMLEscapeMap)
 									escapingUnicode:YES];
-} // gtm_stringByEscapingAsciiHTML
+}// gtm_stringByEscapingAsciiHTML
+
+- (NSString *)stringByEscapingXML {
+        return [self gtm_stringByEscapingHTMLUsingTable:gAsciiHTMLEscapeMap
+                                                 ofSize:sizeof(gAsciiHTMLEscapeMap)
+                                        escapingUnicode:NO];
+} 
 
 - (NSString *)gtm_stringByUnescapingFromHTML {
 	NSRange range = NSMakeRange(0, [self length]);

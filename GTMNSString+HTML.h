@@ -63,4 +63,7 @@
 //
 - (NSString *)gtm_stringByUnescapingFromHTML;
 
+//makes xml ready
+-(NSString *)stringByEscapingXML;
+
 @end
