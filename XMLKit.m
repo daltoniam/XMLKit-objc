@@ -1,9 +1,8 @@
 //
 //  XMLKit.m
-//  kqueue
 //
 //  Created by Dalton Cherry on 9/4/12.
-//  Copyright (c) 2012 Lightspeed Systems. All rights reserved.
+//  Copyright (c) 2012  Chat Simply. All rights reserved.
 //
 
 #import "XMLKit.h"
