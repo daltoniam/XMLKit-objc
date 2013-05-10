@@ -43,6 +43,7 @@
 -(XMLElement*)XMLObjectFromString;
 -(NSString*)stripXMLTags;
 -(NSString*)xmlSafe;
+-(NSString*)xmlUnSafe;
 
 @end
 //////////////////////////////////////////////////////////////////////////////////////
