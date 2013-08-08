@@ -247,6 +247,15 @@
     return s;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+-(NSString*)stripXMLComments
+{
+    NSRange r;
+    NSString *s = self;
+    while ((r = [s rangeOfString:@"<!--[^>]+-->" options:NSRegularExpressionSearch]).location != NSNotFound)
+        s = [s stringByReplacingCharactersInRange:r withString:@""];
+    return s;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
 -(NSString*)xmlSafe
 {
     return [self stringByEscapingXML];
