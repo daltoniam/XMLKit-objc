@@ -32,7 +32,7 @@
     BOOL isValid;
 }
 
-+(XMLElement*)ParseXMLString:(NSString*)string;
++(XMLElement*)parseXMLString:(NSString*)string;
 
 //-(XMLElement*)parse:(NSString*)xmlString;
 
