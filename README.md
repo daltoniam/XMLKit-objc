@@ -14,19 +14,21 @@ via CocoaPods
 
 Install CocoaPods if not already available:
 
-  $ [sudo] gem install cocoapods
-  $ pod setup
-Change to the directory of your Xcode project, and Create and Edit your Podfile and add XMLKit:
+  ```Shell
+  [sudo] gem install cocoapods
+  pod setup
+  ```
+  
+Change to the directory of your Xcode project, and create or edit your Podfile and add XMLKit:
 
-  $ cd /path/to/MyProject
-  $ touch Podfile
-  $ edit Podfile
+  ```Ruby
   platform :ios, '5.0'
   pod 'XMLKit'
+  ```
 
-Install into your project:
+Then run pod install to add to your project.
 
-  $ pod install
+  `pod install`
 
 Open your project in Xcode from the .xcworkspace file (not the usual project file)
 
