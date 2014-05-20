@@ -92,16 +92,16 @@
 {
     XMLElement* rootElement = nil;
     XMLElement* currentElement = nil;
-    int offset = 0;
-    int len = [string length];
+    NSInteger offset = 0;
+    NSInteger len = [string length];
     while (offset > -1)
     {
         NSRange range = [string rangeOfString:@"<" options:0 range:NSMakeRange(offset, len-offset)];
-        int start = range.location;
+        NSInteger start = range.location;
         if(start < 0 || range.location == NSNotFound)
             break;
         range = [string rangeOfString:@">" options:0 range:NSMakeRange(start, len-start)];
-        int end = range.location;
+        NSInteger end = range.location;
         if(end > 0 && range.location != NSNotFound)
             end += 1;
         offset = end;
@@ -159,12 +159,12 @@
 +(XMLElement*)parseElement:(NSString*)text
 {
     //NSLog(@"text: %@",text);
-    int offset = 1;
+    NSInteger offset = 1;
     if([text characterAtIndex:text.length-2] == '/')
         offset = 2;
     XMLElement* element = [[XMLElement alloc] init];
     NSRange range = [text rangeOfString:@" "];
-    int fname = range.location;
+    NSInteger fname = range.location;
     if(fname < 0 || range.location == NSNotFound)
         fname = text.length-1;
     else
@@ -172,7 +172,7 @@
         NSString* attrString = [text substringWithRange:NSMakeRange(fname+1, (text.length-1)-(fname+offset))];
         NSArray* attrArray = [attrString componentsSeparatedByString:@" "];
         NSMutableArray* collect = [NSMutableArray arrayWithCapacity:attrArray.count];
-        for(int i = 0; i < attrArray.count; i++)
+        for(NSInteger i = 0; i < attrArray.count; i++)
         {
             NSString* string = [attrArray objectAtIndex:i];
             if(([string rangeOfString:@"="].location == NSNotFound || [string isEqualToString:@"="]) && collect.count > 0)

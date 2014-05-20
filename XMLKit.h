@@ -14,7 +14,7 @@
 @property(nonatomic, copy)NSString* name;
 @property(nonatomic, copy)NSString* text;
 @property(nonatomic, retain)XMLElement* parent;
-@property(nonatomic, assign)int end;
+@property(nonatomic, assign)NSInteger end;
 //@property(nonatomic, assign)BOOL isValid;
 
 -(NSString*)convertToString;
