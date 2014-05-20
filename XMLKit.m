@@ -1,24 +1,29 @@
+//////////////////////////////////////////////////////////////////////////////////////
 //
 //  XMLKit.m
 //
 //  Created by Dalton Cherry on 9/4/12.
-//  Copyright (c) 2012  Chat Simply. All rights reserved.
 //
+//////////////////////////////////////////////////////////////////////////////////////
 
 #import "XMLKit.h"
 #import "GTMNSString+HTML.h"
 
-//////////////////////////////////////////////////////////////////////////////////////
+@interface XMLElement()
+
+@property(nonatomic, assign)NSInteger end;
+
+@end
+
 @implementation XMLElement
 
-@synthesize childern,attributes,name,text,parent; //isValid
 //////////////////////////////////////////////////////////////////////////////////////
 +(XMLElement*)elementWithName:(NSString*)name attributes:(NSDictionary*)dict
 {
     XMLElement* element = [[XMLElement alloc] init];
     element.name = name;
     element.attributes = [NSMutableDictionary dictionaryWithDictionary:dict];
-    element.childern = [NSMutableArray array];
+    element.children = [NSMutableArray array];
     element.text = @"";
     return element;
 }
@@ -32,7 +37,7 @@
     for(id key in element.attributes)
         attribs = [attribs stringByAppendingFormat:@" %@=\"%@\"",key,[element.attributes objectForKey:key]];
     NSString* string = [NSString stringWithFormat:@"<%@%@>%@",element.name,attribs,textData];
-    for(XMLElement* child in element.childern)
+    for(XMLElement* child in element.children)
         string = [string stringByAppendingString:[self convertHelper:child]];
     string = [string stringByAppendingFormat:@"</%@>",element.name];
     return string;
@@ -52,7 +57,7 @@
         if(![array containsObject:root])
             [array addObject:root];
     }
-    for(XMLElement* child in root.childern)
+    for(XMLElement* child in root.children)
     {
         NSArray* found = [self findElements:tag root:child array:array];
         if(found && !array)
@@ -117,7 +122,7 @@
                 {
                     NSString* tag = [string substringWithRange:NSMakeRange(start, end-start)];
                     XMLElement* element = [XMLKit parseElement:tag];
-                    if([element.name isEqualToString:currentElement.name] && currentElement.childern.count == 0)
+                    if([element.name isEqualToString:currentElement.name] && currentElement.children.count == 0)
                     {
                         NSString* text = [string substringWithRange:NSMakeRange(currentElement.end, start-currentElement.end)];
                         currentElement.text = text;
@@ -140,7 +145,7 @@
                 {
                     element.parent = currentElement;
                     if(currentElement)
-                        [currentElement.childern addObject:element];
+                        [currentElement.children addObject:element];
                 }
                 if([string characterAtIndex:end-2] == '/') //this must be a self closing element
                 {
@@ -219,7 +224,7 @@
     }
     element.name = [text substringWithRange:NSMakeRange(1, fname-1)];
     element.name = [[element.name stringByReplacingOccurrencesOfString:@"/" withString:@""] lowercaseString];
-    element.childern = [NSMutableArray array];
+    element.children = [NSMutableArray array];
     //NSLog(@"element name: %@",element.name);
     //NSLog(@"attributes: %@",element.attributes);
     return element;
@@ -256,12 +261,12 @@
     return s;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
--(NSString*)xmlSafe
+-(NSString*)encodeEntities
 {
     return [self stringByEscapingXML];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
--(NSString*)xmlUnSafe
+-(NSString*)decodeEntities
 {
     return [self gtm_stringByUnescapingFromHTML];
 }
